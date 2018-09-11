@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Aretlas Cross the Rubicon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Aretlas Cross the Rubicon">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Aretlas Cross the Rubicon">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Aretlas Cross the Rubicon">
+  
+    <link rel="alternate" href="/atom.xml" title="Aretlas Cross the Rubicon" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Aretlas Cross the Rubicon</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Neo4j-learn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/31/Neo4j-learn/" class="article-date">
+  <time datetime="2018-08-31T15:18:44.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/31/Neo4j-learn/">Neo4j_learn</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="查询语句"><a href="#查询语句" class="headerlink" title="查询语句"></a>查询语句</h1><p>没有标签的节点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n) WHERE NOT labels(n) RETURN n</span><br></pre></td></tr></table></figure>
+<p>没有任何关系的节点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (s) WHERE NOT ()-[]-(s) RETURN s</span><br></pre></td></tr></table></figure>
+<p>长度为1-4的路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n)-[*1..4]-() RETURN ...</span><br></pre></td></tr></table></figure>
+<p>a和b最短关系路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH p=shortestPath(</span><br><span class="line">(x:xxx&#123;xxx:&quot;xxx&quot;&#125;)-[*]-(x:xxx&#123;xxx:&quot;xxx&quot;&#125;)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>查找两个节点间有多个关系的节点对</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">match (a)-[r]-&gt;(b) with a,b,count(r) as cr where cr&gt;1 return a,b,cr</span><br></pre></td></tr></table></figure>
+<hr>
+<p> 和Tom Hanks共同出演不止电影的演员，有哪些？</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (tom &#123; name: &apos;Tom Hanks&apos; &#125;)--(r)--(otherPerson)</span><br><span class="line">WITH otherPerson, count(*) AS foaf</span><br><span class="line">WHERE foaf &gt; 1</span><br><span class="line">RETURN otherPerson</span><br></pre></td></tr></table></figure>
+<p>count(*)计数的到底是什么呢？看来是r的数量，这似乎不是很符合直觉。</p>
+<hr>
+<p>collect简单例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n) where exists(n.name)</span><br><span class="line">WITH n</span><br><span class="line">ORDER BY n.name desc limit 3</span><br><span class="line">RETURN collect(n.name)</span><br></pre></td></tr></table></figure>
+<hr>
+<p>排除有环的路径</p>
+<p>1、</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MATCH path = (x)-[:KNOWS*]-(y)</span><br><span class="line">UNWIND NODES(path) AS n  </span><br><span class="line">WITH path,   </span><br><span class="line">SIZE(COLLECT(DISTINCT n)) AS testLength   </span><br><span class="line">WHERE testLength = LENGTH(path) + 1</span><br><span class="line">RETURN path</span><br></pre></td></tr></table></figure>
+<p>2、</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH path = (x)-[:KNOWS*]-(y) </span><br><span class="line">WHERE SIZE(apoc.coll.toSet(NODES(path))) = LENGTH(path) + 1 </span><br><span class="line">RETURN path</span><br></pre></td></tr></table></figure>
+<p>3、</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH path = (x)-[:KNOWS*]-(y) </span><br><span class="line">      WHERE apoc.coll.duplicates(NODES(path)) = []</span><br><span class="line">RETURN path</span><br></pre></td></tr></table></figure>
+<hr>
+<p>foreach用法</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MATCH p=(root&#123;name:&apos;root&apos;&#125;)-[r]-(A) </span><br><span class="line">FOREACH (n IN nodes(p) | SET n.marked=TRUE )</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a &#123;name: &apos;root&apos; &#125;)</span><br><span class="line">FOREACH (name IN [&quot;Mike&quot;, &quot;Carl&quot;, &quot;Bruce&quot;] | </span><br><span class="line">CREATE (a)-[:FRIEND]-&gt;(:Person &#123;name: name&#125;))</span><br></pre></td></tr></table></figure>
+<hr>
+<p>UNWIND，把列表解开成行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">WITH [1, 1, 2, 2] AS coll</span><br><span class="line">UNWIND coll AS x</span><br><span class="line">WITH DISTINCT x</span><br><span class="line">RETURN collect(x)</span><br></pre></td></tr></table></figure>
+<p>这是先解开后去重，再collect恢复成列表</p>
+<hr>
+<p>找出所有属性，并统计在节点中出现的数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CALL db.propertyKeys() YIELD propertyKey AS prop</span><br><span class="line">MATCH (n)</span><br><span class="line">WHERE n[prop] IS NOT NULL </span><br><span class="line">RETURN prop, count(n) AS numNodes</span><br></pre></td></tr></table></figure>
+<p>用db.propertyKeys()列出所有属性名，在所有节点中筛选包含属性prop的进行计数</p>
+<hr>
+<p>all()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH p =(a)-[*1..3]-&gt;(b)</span><br><span class="line">WHERE ALL (x IN nodes(p) WHERE x.age &gt; 30)</span><br><span class="line">RETURN p</span><br></pre></td></tr></table></figure>
+<p>断言函数all，用法 fun(v IN list WHERE predicate)</p>
+<p>还有any, none, single, exists</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH p =(n)--&gt;(b)</span><br><span class="line">WHERE SINGLE (var IN nodes(p) WHERE var.eyes = &apos;blue&apos;)</span><br><span class="line">RETURN p</span><br></pre></td></tr></table></figure>
+<p>整条路径只有一个节点eyes属性为blue</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n)</span><br><span class="line">WHERE exists(n.name)</span><br><span class="line">RETURN n.name AS name, exists((n)-[:MARRIED]-&gt;()) AS is_married</span><br></pre></td></tr></table></figure>
+<p>查找所有人，并显示是否已婚</p>
+<hr>
+<p>size()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a)</span><br><span class="line">WHERE a.name = &apos;Alice&apos;</span><br><span class="line">RETURN size((a)--&gt;()--&gt;()) AS fof</span><br></pre></td></tr></table></figure>
+<p>Alice-&gt;()-&gt;()这样的路径有多少个？用size((a)–&gt;()–&gt;())返回得到。</p>
+<hr>
+<p>extract()</p>
+<p>可以使用extract()从节点或关系列表中返回单个属性或者某个函数的值。它将遍历整个列表，针对列表中的每个元素运行一个表达式，然后以列表的形式返回这些结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH p =(a)--&gt;(b)--&gt;(c)</span><br><span class="line">WHERE a.name = &apos;Alice&apos; AND b.name = &apos;Bob&apos; AND c.name = &apos;Daniel&apos;</span><br><span class="line">RETURN extract(n IN nodes(p)| n.age) AS extracted</span><br></pre></td></tr></table></figure>
+<p>通过extract(n IN nodes(p) | n.age)获得路径p中所有节点的年龄，组成列表</p>
+<hr>
+<p>reduce()</p>
+<p>类似python里的reduce</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH p =(a)--&gt;(b)--&gt;(c)</span><br><span class="line">WHERE a.name = &apos;Alice&apos; AND b.name = &apos;Bob&apos; AND c.name = &apos;Daniel&apos;</span><br><span class="line">RETURN reduce(totalAge = 0, n IN nodes(p)| totalAge + n.age) AS reduction</span><br></pre></td></tr></table></figure>
+<p>只要其中年龄大于30的加起来，可以用case when</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MATCH p =(a)--&gt;(b)--&gt;(c)</span><br><span class="line">WHERE a.name = &apos;Alice&apos; AND b.name = &apos;Bob&apos; AND c.name = &apos;Daniel&apos;</span><br><span class="line">RETURN reduce(totalAge = 0, n IN nodes(p)| totalAge + (case when n.age&gt;30 then n.age else 0 end) ) AS reduction</span><br></pre></td></tr></table></figure>
+<p>将路径p里所有节点的年龄加起来</p>
+<hr>
+<p>同名的节点合并为一个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n:Tag)</span><br><span class="line">WITH n.name AS name, COLLECT(n) AS nodelist, COUNT(*) AS count</span><br><span class="line">WHERE count &gt; 1</span><br><span class="line">CALL apoc.refactor.mergeNodes(nodelist) YIELD node</span><br><span class="line">RETURN node</span><br></pre></td></tr></table></figure>
+<p>关系的合并</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (a:X)-[r]-&gt;(b:Y)</span><br><span class="line">WITH a, b, collect(r) as rels</span><br><span class="line">CALL apoc.refactor.mergeRelationships(rels,&#123;properties:&quot;combine&quot;&#125;)</span><br><span class="line">YIELD rel RETURN rel</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="索引、约束、统计"><a href="#索引、约束、统计" class="headerlink" title="索引、约束、统计"></a>索引、约束、统计</h1><p>索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE INDEX ON :Person(name)</span><br></pre></td></tr></table></figure>
+<p>约束，有节点属性的唯一性约束；节点和关系的属性存在性约束。但存在性约束仅限于企业版提供这个功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CREATE CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE</span><br><span class="line">CREATE CONSTRAINT ON (book:Book) ASSERT exists(book.isbn) </span><br><span class="line">CREATE CONSTRAINT ON ()-[like:LIKED]-() ASSERT exists(like.day)</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="执行与调优"><a href="#执行与调优" class="headerlink" title="执行与调优"></a>执行与调优</h1><p>EXPLAIN、PROFILE，前者不真正执行。</p>
+<p>使用USING语句：<br>1、索引提示<br>2、扫描提示<br>3、连接提示</p>
+<p>索引提示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PROFILE</span><br><span class="line">MATCH (p:Person &#123; name: &apos;Tom Hanks&apos; &#125;)</span><br><span class="line">USING INDEX p: Person (name)</span><br><span class="line">RETURN p.born AS column</span><br></pre></td></tr></table></figure>
+<p>扫描提示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PROFILE</span><br><span class="line">MATCH (s: Person)</span><br><span class="line">USING SCAN s: Person</span><br><span class="line">WHERE s.born &lt; 1939</span><br><span class="line">RETURN s.born AS column</span><br></pre></td></tr></table></figure>
+<p>连接提示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MATCH (n1: Person &#123; name:&apos;Keanu Reeves&apos; &#125;)-[: ACTED_IN]-&gt;(m1: Movie)&lt;-[: DIRECTED]-(n2: Person &#123;name:&apos;Lilly Wachowski&apos; &#125;)-[: DIRECTED]-&gt;(m2: Movie &#123; title:&apos;The Matrix Reloaded&apos; &#125;)</span><br><span class="line">USING INDEX n1: Person (name)</span><br><span class="line">USING JOIN ON m1,n2</span><br><span class="line">RETURN m1.title AS column</span><br></pre></td></tr></table></figure>
+<hr>
+<h1 id="嵌入式java开发模式"><a href="#嵌入式java开发模式" class="headerlink" title="嵌入式java开发模式"></a>嵌入式java开发模式</h1><p>maven</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencies&gt;</span><br><span class="line">	&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;org.neo4j&lt;/groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;neo4j&lt;/artifactId&gt;</span><br><span class="line">		&lt;version&gt;3.4.0&lt;/version&gt;</span><br><span class="line">	&lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
+<p>创建一个新db（数据库文件在当前目录的target目录下）；<br>或者选择已有的graph.db</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">private static final File databaseDirectory = new File(&quot;target/neo4j-hello-db&quot;);</span><br><span class="line">void createDb() throws IOException &#123;</span><br><span class="line">        FileUtils.deleteRecursively(databaseDirectory);</span><br><span class="line">        //要创建一个新的数据库或者打开一个已经存在的数据库，</span><br><span class="line">        //首先，需要创建一个GraphDatabaseService实例。</span><br><span class="line">        //GraphDatabaseService实例可以在多个线程之间共享。 </span><br><span class="line">        //但不能创建指向同一数据库的多个实例。</span><br><span class="line">        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(databaseDirectory);</span><br><span class="line">        </span><br><span class="line">        //如果是根据配置文件启动</span><br><span class="line">        //GraphDatabaseService graphDb = new GraphDatabaseFactory()</span><br><span class="line">        //.newEmbeddedDatabaseBuilder( testDirectory.graphDbDir() )</span><br><span class="line">    	 //.loadPropertiesFromFile( pathToConfig + &quot;neo4j.conf&quot; )</span><br><span class="line">    	 //.newGraphDatabase();</span><br><span class="line">    	 </span><br><span class="line">    	 //如果直接再Java代码里设置</span><br><span class="line">    	 //GraphDatabaseService graphDb = new GraphDatabaseFactory()</span><br><span class="line">        //.newEmbeddedDatabaseBuilder( testDirectory.graphDbDir() )</span><br><span class="line">        //.setConfig( GraphDatabaseSettings.pagecache_memory, &quot;512M&quot; )</span><br><span class="line">        //.setConfig( GraphDatabaseSettings.string_block_size, &quot;60&quot; )</span><br><span class="line">        //.setConfig( GraphDatabaseSettings.array_block_size, &quot;300&quot; )</span><br><span class="line">        //.newGraphDatabase();</span><br><span class="line">        </span><br><span class="line">		 //如果只启动只读实例，这个应该很有用</span><br><span class="line">		 //graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder( dir )</span><br><span class="line">        //.setConfig( GraphDatabaseSettings.read_only, &quot;true&quot; )</span><br><span class="line">        //.newGraphDatabase();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        registerShutdownHook(graphDb);</span><br><span class="line">        try (Transaction tx = graphDb.beginTx()) &#123;</span><br><span class="line">            ...</span><br><span class="line">            tx.success();</span><br><span class="line">        &#125;catch(Exception e)&#123;</span><br><span class="line">    			tx.failure();</span><br><span class="line">			&#125;finally&#123;</span><br><span class="line">    			tx.finish();</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private static void registerShutdownHook( final GraphDatabaseService graphDb )&#123;</span><br><span class="line">        // Registers a shutdown hook for the Neo4j instance so that it</span><br><span class="line">        // shuts down nicely when the VM exits (even if you &quot;Ctrl-C&quot; the running application).</span><br><span class="line">        Runtime.getRuntime().addShutdownHook( new Thread()</span><br><span class="line">        &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run()</span><br><span class="line">            &#123;</span><br><span class="line">                graphDb.shutdown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>建标签、节点、属性、关系，删除关系</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public enum MyLabels implements Label&#123;Person&#125;</span><br><span class="line"></span><br><span class="line">firstNode = graphDb.createNode();</span><br><span class="line"></span><br><span class="line">firstNode.setProperty(&quot;message&quot;, &quot;Hello, &quot;);</span><br><span class="line"></span><br><span class="line">//用cypher语句创建</span><br><span class="line">String query=&quot;Create ...&quot;;//返回了一个节点joe</span><br><span class="line">Result res=db.execute(query); </span><br><span class="line">Object joe=res.columnAs(&quot;joe&quot;).next();</span><br><span class="line">if(joe instanceof Node)&#123; return (Node) joe;&#125;</span><br><span class="line">else&#123;throw new RuntimeException(&quot;joe isn&apos;t a node&quot;);</span><br><span class="line"></span><br><span class="line">firstNode.addLabel(MyLabels.Person);</span><br><span class="line"></span><br><span class="line">private enum RelTypes implements RelationshipType &#123; KNOWS &#125;</span><br><span class="line"></span><br><span class="line">relationship = firstNode.createRelationshipTo(secondNode, RelTypes.KNOWS);</span><br><span class="line"></span><br><span class="line">firstNode.getSingleRelationship( RelTypes.KNOWS, Direction.OUTGOING ).delete();</span><br></pre></td></tr></table></figure>
+<p>遍历</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">private GraphDatabaseService db;</span><br><span class="line">private TraversalDescription friendsTraversal;</span><br><span class="line">public static void main( String[] args ) throws IOException</span><br><span class="line">&#123;</span><br><span class="line">    FileUtils.deleteRecursively( databaseDirectory );</span><br><span class="line">    TraversalExample example = new TraversalExample(  );</span><br><span class="line">    Node joe = example.createData();</span><br><span class="line">    example.run(joe);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public TraversalExample( )</span><br><span class="line">&#123;</span><br><span class="line">    this.db =  new GraphDatabaseFactory().newEmbeddedDatabase( databaseDirectory );</span><br><span class="line">    friendsTraversal = db.traversalDescription()</span><br><span class="line">            .depthFirst()</span><br><span class="line">            .relationships( Rels.KNOWS )</span><br><span class="line">            .uniqueness( Uniqueness.RELATIONSHIP_GLOBAL );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private void run( Node joe )</span><br><span class="line">&#123;</span><br><span class="line">    try (Transaction tx = db.beginTx())</span><br><span class="line">    &#123;</span><br><span class="line">        //out.println( relationships( joe ) );</span><br><span class="line">        //out.println( nodes( joe ) );</span><br><span class="line">        out.println( knowsLikesTraverser( joe ));</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">public String nodes( Node node )</span><br><span class="line">&#123;</span><br><span class="line">    String output = &quot;&quot;;</span><br><span class="line">    // START SNIPPET: nodes</span><br><span class="line">    for ( Node currentNode : friendsTraversal</span><br><span class="line">            .traverse( node )</span><br><span class="line">            .nodes() )</span><br><span class="line">    &#123;</span><br><span class="line">        output += currentNode.getProperty( &quot;name&quot; ) + &quot;\n&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    // END SNIPPET: nodes</span><br><span class="line">    return output;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public String relationships( Node node )</span><br><span class="line">&#123;</span><br><span class="line">    String output = &quot;&quot;;</span><br><span class="line">    for ( Relationship relationship : friendsTraversal</span><br><span class="line">            .traverse( node )</span><br><span class="line">            .relationships() )</span><br><span class="line">    &#123;</span><br><span class="line">        output += relationship.getType().name() + &quot;\n&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    return output;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public String knowsLikesTraverser( Node node )</span><br><span class="line">&#123;</span><br><span class="line">	String output = &quot;&quot;;</span><br><span class="line">	for ( Path position : db.traversalDescription()</span><br><span class="line">                .depthFirst() // 指定深度优先</span><br><span class="line">                //.breadthFirst() //指定广度优先</span><br><span class="line">                .relationships( Rels.KNOWS ) //指定遍历KNOWS关系，没有指定关系指向</span><br><span class="line">                .relationships( Rels.LIKES, Direction.INCOMING )//指定遍历LIKES关系，指定关系指向为 INCOMING</span><br><span class="line">                .evaluator( Evaluators.fromDepth( 2 ) )</span><br><span class="line">                .evaluator( Evaluators.toDepth( 5 ) ) //指定最深的遍历深度为5，即遍历后的结果路径长度都为 5或更短</span><br><span class="line">                .traverse( node ) ) //指定遍历开始的节点</span><br><span class="line">    &#123;</span><br><span class="line">        output += position + &quot;\n&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">        // END SNIPPET: knowslikestraverser</span><br><span class="line">        return output;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据标签、属性查找节点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// ResourceIterator&lt;Node&gt; findNodes(Label label) </span><br><span class="line">ResourceIterator&lt;Node&gt; persons=graphDb.findNodes(MyLabels.Person);</span><br><span class="line">persons.forEachRemaining((entityTypeGraphNode) -&gt; &#123;</span><br><span class="line">    System.out.print( entityTypeGraphNode.getProperties(&quot;message&quot;));</span><br><span class="line">    Iterable&lt;Relationship&gt; typeObjectsRelationships = entityTypeGraphNode.getRelationships();</span><br><span class="line">    typeObjectsRelationships.forEach(</span><br><span class="line">        (relationship) -&gt; &#123;</span><br><span class="line">            Node entityGraphNode = relationship.getEndNode();</span><br><span class="line">            System.out.print( entityGraphNode.getProperty(&quot;message&quot;));                        </span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<hr>
+<p>对于遍历，需要了解一些概念：</p>
+<p>1、路径扩展（PathExpander）：一般是指关系的指向、关系的类型。</p>
+<p>2、顺序（Order）：如深度优先或广度优先。</p>
+<p>3、唯一性（Uniqueness）：确保每个节点（或关系、路径）指遍历一次。</p>
+<p>4、开始节点</p>
+<hr>
+<p>索引</p>
+<p>创建索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">IndexManager index = graphDb.index();</span><br><span class="line">Index&lt;Node&gt; actors = index.forNodes( &quot;actors&quot; );</span><br><span class="line">Index&lt;Node&gt; movies = index.forNodes( &quot;movies&quot; );</span><br><span class="line">RelationshipIndex roles = index.forRelationships( &quot;roles&quot; );</span><br><span class="line">//删除actors索引</span><br><span class="line">actors.delete()</span><br></pre></td></tr></table></figure>
+<p>确认索引是否已存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IndexManager index = graphDb.index();</span><br><span class="line">boolean indexExists = index.existsForNodes( &quot;actors&quot; );</span><br></pre></td></tr></table></figure>
+<p>将索引添加到节点（的属性上）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Node reeves = graphDb.createNode();</span><br><span class="line">reeves.setProperty( &quot;name&quot;, &quot;Keanu Reeves&quot; ); </span><br><span class="line">//不是很理解为什么会需要第三个参数</span><br><span class="line">actors.add( reeves, &quot;name&quot;, reeves.getProperty( &quot;name&quot; ) );</span><br></pre></td></tr></table></figure>
+<p>将索引添加到关系（的属性上）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RelationshipIndex roles = index.forRelationships( &quot;roles&quot; );</span><br><span class="line">RelationshipType ACTS_IN = RelationshipType.withName( &quot;ACTS_IN&quot; );</span><br><span class="line">Relationship role1 = reeves.createRelationshipTo( theMatrix, ACTS_IN );</span><br><span class="line">role1.setProperty( &quot;name&quot;, &quot;Neo&quot; );</span><br><span class="line">roles.add( role1, &quot;name&quot;, role1.getProperty( &quot;name&quot; ) );</span><br></pre></td></tr></table></figure>
+<p>节点索引下的查询</p>
+<p>1、get方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IndexHits&lt;Node&gt; hits = actors.get( &quot;name&quot;, &quot;Keanu Reeves&quot; )</span><br><span class="line">//getSingle只返回第一个也是唯一的项不存在则返回null，多个则抛出oSuchElementException </span><br><span class="line">Node reeves = hits.getSingle();</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Relationship persephone = roles.get( &quot;name&quot;, &quot;Persephone&quot; ).getSingle();</span><br><span class="line">Node actor = persephone.getStartNode();</span><br><span class="line">Node movie = persephone.getEndNode();</span><br><span class="line"></span><br><span class="line">for ( Relationship role : roles.get( &quot;name&quot;, &quot;Neo&quot; ) )</span><br><span class="line">&#123;</span><br><span class="line">    Node reeves = role.getStartNode();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2、query方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for ( Node movie : movies.query( &quot;title:*Matrix* AND year:1999&quot; ) )</span><br><span class="line">&#123;</span><br><span class="line">    // 返回结果为 1999年的 &quot;The Matrix&quot;.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 查询一个以reeves作为开始节点的关系</span><br><span class="line">// 使用单一键值对的匹配方法</span><br><span class="line">IndexHits&lt;Relationship&gt; reevesAsNeoHits;</span><br><span class="line">reevesAsNeoHits = roles.get( &quot;name&quot;, &quot;Neo&quot;, reeves, null );</span><br><span class="line">Relationship reevesAsNeo = reevesAsNeoHits.iterator().next();</span><br><span class="line">reevesAsNeoHits.close();</span><br><span class="line">//查询一个以theMatrix作为结束节点的关系</span><br><span class="line">// 使用query方法</span><br><span class="line">IndexHits&lt;Relationship&gt; matrixNeoHits;</span><br><span class="line">matrixNeoHits = roles.query( &quot;name&quot;, &quot;*eo&quot;, null, theMatrix );</span><br><span class="line">Relationship matrixNeo = matrixNeoHits.iterator().next();</span><br><span class="line">matrixNeoHits.close();</span><br></pre></td></tr></table></figure>
+<p>结果相似度评分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">IndexHits&lt;Node&gt; hits = movies.query( &quot;title&quot;, &quot;The*&quot; );</span><br><span class="line">for ( Node movie : hits )</span><br><span class="line">&#123;</span><br><span class="line">    System.out.println( movie.getProperty( &quot;title&quot; ) + &quot; &quot; + hits.currentScore() );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>全文索引（略）</p>
+<hr>
+<p>过程（Procedure）是以Java编写然后部署到数据库中的扩展插件，过程可以在Cypher中调用。</p>
+<p>过程是扩展Neo4j的首选手段。过程能够提供的功能如下：</p>
+<p>（1）提供对Cypher中不可用的功能的访问，例如手动索引；</p>
+<p>（2）提供对第三方系统的访问；</p>
+<p>（3）执行全局操作，例如对连接的组件计数或查找密集节点；</p>
+<p>（4）实现难以用Cypher明确表达的操作。</p>
+<hr>
+<p>自定义过程</p>
+<p>pom文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 指明打包为jar文件 --&gt;</span><br><span class="line">  &lt;packaging&gt;jar&lt;/packaging&gt;</span><br><span class="line">  &lt;name&gt;Neo4j Procedure Template&lt;/name&gt;</span><br><span class="line">  &lt;description&gt;xxx&lt;/description&gt;</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">   &lt;dependencies&gt;</span><br><span class="line"> &lt;!-- neo4j的依赖包--&gt;</span><br><span class="line">  &lt;dependency&gt;</span><br><span class="line">   &lt;groupId&gt;org.neo4j&lt;/groupId&gt;</span><br><span class="line">   &lt;artifactId&gt;neo4j&lt;/artifactId&gt;</span><br><span class="line">   &lt;version&gt;3.4.0&lt;/version&gt;</span><br><span class="line">   &lt;scope&gt;provided&lt;/scope&gt; &lt;!-- 注意：必须 指明不需要把此依赖中的jar打包进去 --&gt;</span><br><span class="line">  &lt;/dependency&gt;  </span><br><span class="line"> &lt;/dependencies&gt;</span><br><span class="line">  </span><br><span class="line"> &lt;!--  指明将本项目打包，并配置打包 --&gt;</span><br><span class="line">    &lt;build&gt;</span><br><span class="line">    &lt;plugins&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;3.1&lt;/version&gt;</span><br><span class="line">        &lt;configuration&gt;</span><br><span class="line">          &lt;!-- Neo4j 过程需要  Java 8 --&gt;</span><br><span class="line">          &lt;source&gt;1.8&lt;/source&gt;</span><br><span class="line">          &lt;target&gt;1.8&lt;/target&gt;</span><br><span class="line">        &lt;/configuration&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">      &lt;plugin&gt;</span><br><span class="line">        &lt;!-- 生成jar文件--&gt;</span><br><span class="line">        &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.4.3&lt;/version&gt;</span><br><span class="line">        &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">            &lt;phase&gt;package&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">              &lt;goal&gt;shade&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">        &lt;/executions&gt;</span><br><span class="line">      &lt;/plugin&gt;</span><br><span class="line">    &lt;/plugins&gt;</span><br><span class="line">  &lt;/build&gt;</span><br></pre></td></tr></table></figure>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">//创建一个过程，实现对节点 创建 全文索引功能, 使用mvn clean package 命令 对本项目打包，生成 jar 文件</span><br><span class="line">/* 调用com.xxx.neo4j.index 将节点添加到我们创建的索引里</span><br><span class="line"> * MATCH (n:Person)</span><br><span class="line">CALL com.xxx.neo4j.index(id(n), [&apos;name&apos;])</span><br><span class="line">RETURN n;</span><br><span class="line"></span><br><span class="line">调用com.xxx.neo4j.search 去从索引里查询节点并返回 nodeId</span><br><span class="line">CALL com.xxx.neo4j.search(&apos;Person&apos;,&apos;name:Jo*&apos;)</span><br><span class="line"></span><br><span class="line">*/</span><br><span class="line">public class FullTextIndex &#123;</span><br><span class="line"></span><br><span class="line">	@Context // 使用注解方式，实例化GraphDatabaseService</span><br><span class="line">	public GraphDatabaseService db;</span><br><span class="line"></span><br><span class="line">	// 声明一个全文索引的配置</span><br><span class="line">	private static final Map&lt;String, String&gt; FULL_TEXT = stringMap(IndexManager.PROVIDER, &quot;lucene&quot;, &quot;type&quot;, &quot;fulltext&quot;);</span><br><span class="line"></span><br><span class="line">	@Context</span><br><span class="line">	public Log log;</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	/*</span><br><span class="line">	 * 创建一个名为 com.xxx.neo4j.index的过程， 将指定id的节点 添加到新创建的索引里面</span><br><span class="line">	 */</span><br><span class="line">	@Procedure(value = &quot;com.xxx.neo4j.index&quot;, mode=Mode.WRITE)</span><br><span class="line">    @Description(&quot;用户自定义过程实例index，将指定id的节点 添加到新创建的索引里面&quot;)</span><br><span class="line">    public void index( @Name(&quot;nodeId&quot;) long nodeId,</span><br><span class="line">                       @Name(&quot;properties&quot;) List&lt;String&gt; propKeys )</span><br><span class="line">    &#123;</span><br><span class="line">		//所有neo4j嵌入式开发中的所有操作，都可以写入到我们这个过程内部</span><br><span class="line">		</span><br><span class="line">        Node node = db.getNodeById( nodeId );</span><br><span class="line"></span><br><span class="line">        // 将nodes节点里面的所有属性拿出来拼装到一个 set里.</span><br><span class="line">        Set&lt;Map.Entry&lt;String,Object&gt;&gt; properties =</span><br><span class="line">                node.getProperties( propKeys.toArray( new String[0] ) ).entrySet();</span><br><span class="line"></span><br><span class="line">        // Index every label (this is just as an example, we could filter which labels to index)</span><br><span class="line">        for ( Label label : node.getLabels() )</span><br><span class="line">        &#123;</span><br><span class="line">            Index&lt;Node&gt; index = db.index().forNodes( indexName( label.name() ), FULL_TEXT );</span><br><span class="line"></span><br><span class="line">            // 先确保 此节点不在 我们创建的index索引里</span><br><span class="line">            index.remove( node );</span><br><span class="line"></span><br><span class="line">            // 将node节点 按照它带有的全部属性，去将node节点添加到index索引里面</span><br><span class="line">            for ( Map.Entry&lt;String,Object&gt; property : properties )</span><br><span class="line">            &#123;</span><br><span class="line">                index.add( node, property.getKey(), property.getValue() );</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">	/* </span><br><span class="line">	 * 通过我们创建的索引，按条件查询出节点</span><br><span class="line">	 */</span><br><span class="line">	 @Procedure(value = &quot;com.xxx.neo4j.search&quot;)</span><br><span class="line">	    @Description(&quot;通过我们创建的索引，按条件查询出节点&quot;)</span><br><span class="line">	    public Stream&lt;SearchHit&gt; search( @Name(&quot;label&quot;) String label,</span><br><span class="line">	                                     @Name(&quot;query&quot;) String query )</span><br><span class="line">	    &#123;</span><br><span class="line">	        String index = indexName( label );</span><br><span class="line"></span><br><span class="line">	        // 检查此索引是否已经在数据库里存在</span><br><span class="line">	        if( !db.index().existsForNodes( index ))</span><br><span class="line">	        &#123;</span><br><span class="line">	            // Just to show how you&apos;d do logging</span><br><span class="line">	            log.debug( &quot;索引不存在: `%s`&quot;, index );</span><br><span class="line">	            return Stream.empty();</span><br><span class="line">	        &#125;</span><br><span class="line"></span><br><span class="line">	        // 如果索引存在，就返回通过索引查询的结果</span><br><span class="line">	        return db.index()</span><br><span class="line">	                .forNodes( index )</span><br><span class="line">	                .query( query ) //可以用通配符 *user?</span><br><span class="line">	                .stream()</span><br><span class="line">	                .map( SearchHit::new );</span><br><span class="line">	    &#125;</span><br><span class="line">	 </span><br><span class="line">	    public static class SearchHit</span><br><span class="line">	    &#123;</span><br><span class="line">	        // This records contain a single field named &apos;nodeId&apos;</span><br><span class="line">	        public long nodeId;</span><br><span class="line"></span><br><span class="line">	        public SearchHit( Node node )</span><br><span class="line">	        &#123;</span><br><span class="line">	            this.nodeId = node.getId();</span><br><span class="line">	        &#125;</span><br><span class="line">	    &#125;</span><br><span class="line">	    </span><br><span class="line">	</span><br><span class="line">	private String indexName( String label )</span><br><span class="line">    &#123;</span><br><span class="line">        return &quot;label-&quot; + label;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>自定义聚合函数</p>
+<p>用户定义的聚合函数使用@UserAggregationFunction进行注释。 带注释的函数必须返回聚合器类的实例。聚合器类包含一个用@UserAggregationUpdate注解的方法和@UserAggregationResult注解的方法。使用@UserAggregationUpdate注解的方法将被多次调用 对数据进行聚合操作。聚合完成后将使用@UserAggregationResult注释的方法并返回聚合结果。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/31/Neo4j-learn/" data-id="cjlu9mxz90004agy5cehm5etg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Neo4j-data/">Neo4j ; data</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-biu" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/26/biu/" class="article-date">
+  <time datetime="2018-08-26T12:20:25.000Z" itemprop="datePublished">2018-08-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/26/biu/">biu</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>开始分省库汇聚后的数据处理工作，估计还会有不少问题，做好心理准备，嗯。</p>
+<p>待填的坑大概有：</p>
+<h3 id="数据质量分析"><a href="#数据质量分析" class="headerlink" title="数据质量分析"></a>数据质量分析</h3><p>肯定有些是没法解决的，只能投放后留给后人了，但所有质量问题都要留下处理方案。</p>
+<h3 id="各省验证"><a href="#各省验证" class="headerlink" title="各省验证"></a>各省验证</h3><p>唯一的作用就是让各省签字吧……指望不上他们能主动处理什么问题，做的越多，风险越大。</p>
+<h3 id="投放"><a href="#投放" class="headerlink" title="投放"></a>投放</h3><p>这是深坑，估计会有不少问题。</p>
+<h3 id="反省"><a href="#反省" class="headerlink" title="反省"></a>反省</h3><p>文档、附件、脚本和组织等等问题太多了，都需要重新调整，我们4个90后祭天兄弟团，必定是要踩不少雷，但如果这次吃够了教训，也许能确保9月安全着陆。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>嗯，主要是给老板们看的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/26/biu/" data-id="cjlu9mxyr0001agy5k3kvbe9q" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/数据-ITS/">数据 ITS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Neo4j-data/">Neo4j ; data</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/数据-ITS/">数据 ITS</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Neo4j-data/" style="font-size: 10px;">Neo4j ; data</a> <a href="/tags/数据-ITS/" style="font-size: 10px;">数据 ITS</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/08/31/Neo4j-learn/">Neo4j_learn</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/26/biu/">biu</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Aretlas<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
